@@ -518,11 +518,11 @@ class preFlightsChecks:
         Generate secure .env file with random passwords during installation
         """
         try:
-            import sys
-            import socket
-            
-            # Import the environment generator
-            sys.path.append(os.path.join(self.codexpanelPath, 'install'))
+            # Import the environment generator from the same directory as this script
+            # (__file__ is always correct regardless of cwd or how Python was invoked)
+            _script_dir = os.path.dirname(os.path.abspath(__file__))
+            if _script_dir not in sys.path:
+                sys.path.insert(0, _script_dir)
             from env_generator import create_env_file, create_env_backup
             
             # Generate secure credentials
@@ -551,7 +551,21 @@ class preFlightsChecks:
         """
         logging.InstallLog.writeToFile("Using fallback method for settings.py update")
         
-        path = self.codexpanelPath + "/CodexCP/settings.py"
+        # Try multiple possible locations for settings.py
+        _script_dir = os.path.dirname(os.path.abspath(__file__))
+        _project_root = os.path.dirname(_script_dir)
+        _paths_to_try = [
+            os.path.join(_project_root, 'CodexCP', 'settings.py'),
+            os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py'),
+        ]
+        path = None
+        for _p in _paths_to_try:
+            if os.path.exists(_p):
+                path = _p
+                break
+        if path is None:
+            path = _paths_to_try[0]
+        logging.InstallLog.writeToFile("settings.py path: %s" % path)
         data = open(path, "r").readlines()
         writeDataToFile = open(path, "w")
         counter = 0
@@ -590,7 +604,12 @@ class preFlightsChecks:
         command = "git clone https://github.com/josevijuzen-source/CODEXPANEL"
         preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
-        shutil.move('codexpanel', 'CodexCP')
+        if os.path.exists('CODEXPANEL'):
+            shutil.move('CODEXPANEL', 'CodexCP')
+        elif os.path.exists('codexpanel'):
+            shutil.move('codexpanel', 'CodexCP')
+        else:
+            logging.InstallLog.writeToFile("[WARN] Neither CODEXPANEL nor codexpanel directory found to rename")
 
         ##
 
@@ -633,17 +652,20 @@ password="%s"
 
         logging.InstallLog.writeToFile("Environment configuration generated successfully!")
 
+        # Define path to settings.py at the install root for subsequent operations
+        settings_path = os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py')
+
         if self.remotemysql == 'ON':
-            command = "sed -i 's|localhost|%s|g' %s" % (self.mysqlhost, path)
+            command = "sed -i 's|localhost|%s|g' %s" % (self.mysqlhost, settings_path)
             preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
-            # command = "sed -i 's|'mysql'|'%s'|g' %s" % (self.mysqldb, path)
+            # command = "sed -i 's|'mysql'|'%s'|g' %s" % (self.mysqldb, settings_path)
             # preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
-            command = "sed -i 's|root|%s|g' %s" % (self.mysqluser, path)
+            command = "sed -i 's|root|%s|g' %s" % (self.mysqluser, settings_path)
             preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
-            command = "sed -i \"s|'PORT': ''|'PORT':'%s'|g\" %s" % (self.mysqlport, path)
+            command = "sed -i \"s|'PORT': ''|'PORT':'%s'|g\" %s" % (self.mysqlport, settings_path)
             preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
         logging.InstallLog.writeToFile("settings.py updated!")
