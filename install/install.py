@@ -517,54 +517,42 @@ class preFlightsChecks:
         """
         Generate secure .env file with random passwords during installation
         """
-        try:
-            # Import the environment generator from the same directory as this script
-            # (__file__ is always correct regardless of cwd or how Python was invoked)
-            _script_dir = os.path.dirname(os.path.abspath(__file__))
-            if _script_dir not in sys.path:
-                sys.path.insert(0, _script_dir)
-            from env_generator import create_env_file, create_env_backup
-            
-            # Generate secure credentials
-            credentials = create_env_file(
-                self.codexpanelPath, 
-                mysql_root_password, 
-                codexpanel_db_password
-            )
-            
-            # Create backup for recovery
-            create_env_backup(self.codexpanelPath, credentials)
-            
-            logging.InstallLog.writeToFile("âœ“ Secure .env file generated successfully")
-            logging.InstallLog.writeToFile("âœ“ Credentials backup created for recovery")
-            
-            return credentials
-            
-        except Exception as e:
-            logging.InstallLog.writeToFile(f"[ERROR] Failed to generate secure environment file: {str(e)}")
-            # Fallback to original method if environment generation fails
-            self.fallback_settings_update(mysql_root_password, codexpanel_db_password)
+        # Import from the validated install root, not the installer staging tree.
+        # download_install_codexpanel() copies and validates this file first.
+        import importlib.util
+        env_gen_path = os.path.join(self.codexpanelPath, 'install', 'env_generator.py')
+        if not os.path.exists(env_gen_path):
+            raise FileNotFoundError("env_generator.py not found at install root: %s" % env_gen_path)
+
+        logging.InstallLog.writeToFile("Loading env_generator from: %s" % env_gen_path)
+        spec = importlib.util.spec_from_file_location("env_generator", env_gen_path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        # Generate secure credentials
+        credentials = mod.create_env_file(
+            self.codexpanelPath,
+            mysql_root_password,
+            codexpanel_db_password
+        )
+
+        # Create backup for recovery
+        mod.create_env_backup(self.codexpanelPath, credentials)
+
+        logging.InstallLog.writeToFile("Secure .env file generated successfully")
+        logging.InstallLog.writeToFile("Credentials backup created for recovery")
+
+        return credentials
 
     def fallback_settings_update(self, mysqlPassword, password):
         """
         Fallback method to update settings.py directly if environment generation fails
         """
         logging.InstallLog.writeToFile("Using fallback method for settings.py update")
-        
-        # Try multiple possible locations for settings.py
-        _script_dir = os.path.dirname(os.path.abspath(__file__))
-        _project_root = os.path.dirname(_script_dir)
-        _paths_to_try = [
-            os.path.join(_project_root, 'CodexCP', 'settings.py'),
-            os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py'),
-        ]
-        path = None
-        for _p in _paths_to_try:
-            if os.path.exists(_p):
-                path = _p
-                break
-        if path is None:
-            path = _paths_to_try[0]
+
+        path = os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py')
+        if not os.path.exists(path):
+            raise FileNotFoundError("settings.py not found at install root: %s" % path)
         logging.InstallLog.writeToFile("settings.py path: %s" % path)
         data = open(path, "r").readlines()
         writeDataToFile = open(path, "w")
@@ -597,19 +585,41 @@ class preFlightsChecks:
     def download_install_codexpanel(self, mysqlPassword, mysql):
         ##
 
-        os.chdir(self.path)
+        # Determine the repo root from this script's location.
+        # __file__ always points to the currently executing script,
+        # so dirname(dirname(__file__)) is the repo root regardless
+        # of how Python was invoked or what the CWD is.
+        _script_dir = os.path.dirname(os.path.abspath(__file__))
+        _repo_root = os.path.dirname(_script_dir)
 
-        os.chdir('/usr/local')
+        for required_file in [
+            os.path.join(_repo_root, 'install', 'env_generator.py'),
+            os.path.join(_repo_root, 'CodexCP', 'settings.py'),
+            os.path.join(_repo_root, 'manage.py'),
+        ]:
+            if not os.path.exists(required_file):
+                raise FileNotFoundError("Required source file missing before install-root copy: %s" % required_file)
 
-        command = "git clone https://github.com/josevijuzen-source/CODEXPANEL"
-        preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
-
-        if os.path.exists('CODEXPANEL'):
-            shutil.move('CODEXPANEL', 'CodexCP')
-        elif os.path.exists('codexpanel'):
-            shutil.move('codexpanel', 'CodexCP')
+        # Copy the complete repo to the install root.
+        # The staging repo at _repo_root was set up by codexpanel.sh;
+        # we copy it to /usr/local/CodexCP/ so that the Django project
+        # (CodexCP/settings.py, manage.py, etc.) is available at the
+        # expected install path for all subsequent operations.
+        if not os.path.isdir(self.codexpanelPath) or not os.path.exists(os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py')):
+            logging.InstallLog.writeToFile("Copying CodexPanel source from %s to %s" % (_repo_root, self.codexpanelPath))
+            if os.path.isdir(self.codexpanelPath):
+                shutil.rmtree(self.codexpanelPath)
+            shutil.copytree(_repo_root, self.codexpanelPath, symlinks=True)
         else:
-            logging.InstallLog.writeToFile("[WARN] Neither CODEXPANEL nor codexpanel directory found to rename")
+            logging.InstallLog.writeToFile("Install root %s already exists with settings.py" % self.codexpanelPath)
+
+        for required_file in [
+            os.path.join(self.codexpanelPath, 'install', 'env_generator.py'),
+            os.path.join(self.codexpanelPath, 'CodexCP', 'settings.py'),
+            os.path.join(self.codexpanelPath, 'manage.py'),
+        ]:
+            if not os.path.exists(required_file):
+                raise FileNotFoundError("Required install file missing after source copy: %s" % required_file)
 
         ##
 
