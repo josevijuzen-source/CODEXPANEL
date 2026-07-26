@@ -1365,20 +1365,68 @@ gpgcheck=1
                 command = 'ln -s /etc/pure-ftpd/conf/UnixAuthentication /etc/pure-ftpd/auth/65unix'
                 install_utils.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
-                command = 'systemctl restart pure-ftpd-mysql.service'
-                install_utils.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
+                # Validate pure-ftpd config before restart
+                try:
+                    validate_proc = subprocess.run(
+                        ['/usr/sbin/pure-ftpd-mysql', '/etc/pure-ftpd/pure-ftpd.conf', '-D', '-d'],
+                        capture_output=True, text=True, timeout=5
+                    )
+                    if validate_proc.returncode != 0:
+                        err_out = (validate_proc.stderr or validate_proc.stdout or '').strip()
+                        if err_out:
+                            self.stdOut('[WARN] pure-ftpd config validation: %s' % err_out, 1)
+                            logging.InstallLog.writeToFile('[WARN] pure-ftpd config validation: %s' % err_out)
+                except subprocess.TimeoutExpired:
+                    pass
+                except Exception as exc:
+                    logging.InstallLog.writeToFile('[WARN] Could not validate pure-ftpd config: %s' % str(exc))
 
-
-
+                # Restart with diagnostic capture - do not exit on failure
+                restart_proc = subprocess.run(
+                    'systemctl restart pure-ftpd-mysql.service 2>&1',
+                    shell=True, capture_output=True, text=True, timeout=30
+                )
+                if restart_proc.returncode != 0:
+                    err = (restart_proc.stdout or '').strip() or 'exit code %d' % restart_proc.returncode
+                    self.stdOut('[ERROR] Failed to restart pure-ftpd-mysql: %s' % err, 1)
+                    logging.InstallLog.writeToFile('[ERROR] Failed to restart pure-ftpd-mysql: %s' % err)
+                    for diag_cmd in [
+                        'systemctl status pure-ftpd-mysql.service --no-pager 2>&1',
+                        'journalctl -u pure-ftpd-mysql.service -n 100 --no-pager --output=short 2>&1'
+                    ]:
+                        diag_proc = subprocess.run(diag_cmd, shell=True, capture_output=True, text=True, timeout=10)
+                        diag_out = (diag_proc.stdout or diag_proc.stderr or '').strip()
+                        if diag_out:
+                            logging.InstallLog.writeToFile('[DIAG] %s\n%s' % (diag_cmd, diag_out))
+                    self.stdOut('[WARN] Continuing despite pure-ftpd-mysql restart failure', 1)
+                else:
+                    self.stdOut('pure-ftpd-mysql restarted successfully', 1)
 
                 if get_Ubuntu_release() > 21.00:
                     ### change mysql md5 to crypt
 
                     command = "sed -i 's/MYSQLCrypt md5/MYSQLCrypt crypt/g' /etc/pure-ftpd/db/mysql.conf"
-                    install_utils.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
+                    install_utils.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
 
-                    command = "systemctl restart pure-ftpd-mysql.service"
-                    install_utils.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
+                    restart2_proc = subprocess.run(
+                        'systemctl restart pure-ftpd-mysql.service 2>&1',
+                        shell=True, capture_output=True, text=True, timeout=30
+                    )
+                    if restart2_proc.returncode != 0:
+                        err2 = (restart2_proc.stdout or '').strip() or 'exit code %d' % restart2_proc.returncode
+                        self.stdOut('[ERROR] Failed to restart pure-ftpd-mysql after crypt change: %s' % err2, 1)
+                        logging.InstallLog.writeToFile('[ERROR] After crypt change: %s' % err2)
+                        for diag_cmd in [
+                            'systemctl status pure-ftpd-mysql.service --no-pager 2>&1',
+                            'journalctl -u pure-ftpd-mysql.service -n 100 --no-pager --output=short 2>&1'
+                        ]:
+                            diag_proc = subprocess.run(diag_cmd, shell=True, capture_output=True, text=True, timeout=10)
+                            diag_out = (diag_proc.stdout or diag_proc.stderr or '').strip()
+                            if diag_out:
+                                logging.InstallLog.writeToFile('[DIAG] %s\n%s' % (diag_cmd, diag_out))
+                        self.stdOut('[WARN] Continuing despite pure-ftpd-mysql restart failure', 1)
+                    else:
+                        self.stdOut('pure-ftpd-mysql restarted successfully after crypt change', 1)
             else:
 
                 try:

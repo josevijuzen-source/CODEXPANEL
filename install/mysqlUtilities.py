@@ -1,5 +1,6 @@
 ﻿import subprocess, shlex
 import install
+import installLog as logging
 import time
 
 class mysqlUtilities:
@@ -8,7 +9,7 @@ class mysqlUtilities:
     def createDatabase(dbname, dbuser, dbpassword, publicip):
 
         try:
-            createDB = "CREATE DATABASE " + dbname
+            createDB = "CREATE DATABASE IF NOT EXISTS " + dbname
 
             try:
                 from json import loads
@@ -36,12 +37,12 @@ class mysqlUtilities:
             res = subprocess.call(cmd)
 
             if res == 1:
-                return 0
+                logging.InstallLog.writeToFile("[WARN] CREATE DATABASE %s failed (may already exist)" % dbname)
 
             if remote:
-                createUser = "CREATE USER '" + dbuser + "'@'%s' IDENTIFIED BY '" % (publicip) + dbpassword + "'"
+                createUser = "CREATE USER IF NOT EXISTS '" + dbuser + "'@'%s' IDENTIFIED BY '" % (publicip) + dbpassword + "'"
             else:
-                createUser = "CREATE USER '" + dbuser + "'@'localhost' IDENTIFIED BY '" + dbpassword + "'"
+                createUser = "CREATE USER IF NOT EXISTS '" + dbuser + "'@'localhost' IDENTIFIED BY '" + dbpassword + "'"
 
             command = initCommand + createUser + '"'
 
@@ -53,7 +54,7 @@ class mysqlUtilities:
             res = subprocess.call(cmd)
 
             if res == 1:
-                return 0
+                logging.InstallLog.writeToFile("[WARN] CREATE USER %s failed (may already exist)" % dbuser)
             else:
 
                 if remote:
