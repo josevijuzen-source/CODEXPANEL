@@ -1150,11 +1150,24 @@ gpgcheck=1
         conn = mariadb.connect(user='root', passwd=self.mysql_Root_password)
         cursor = conn.cursor()
         cursor.execute('set global innodb_file_per_table = on;')
+        cursor.execute("SELECT VERSION()")
+        version_row = cursor.fetchone()
+        version_str = str(version_row[0]) if version_row else ""
+        self.stdOut("MariaDB version detected: " + version_str)
+        version_parts = version_str.split('.')
         try:
-            cursor.execute('set global innodb_file_format = Barracuda;')
-            cursor.execute('set global innodb_large_prefix = on;')
-        except BaseException as msg:
-            self.stdOut('%s. [ERROR:335]' % (str(msg)))
+            major = int(version_parts[0]) if len(version_parts) > 0 else 0
+            minor = int(version_parts[1]) if len(version_parts) > 1 else 0
+        except ValueError:
+            major, minor = 0, 0
+        if major > 10 or (major == 10 and minor >= 6):
+            self.stdOut("MariaDB 10.6+ detected, skipping legacy InnoDB settings (innodb_file_format/innodb_large_prefix removed in 10.6)")
+        else:
+            try:
+                cursor.execute('set global innodb_file_format = Barracuda;')
+                cursor.execute('set global innodb_large_prefix = on;')
+            except BaseException as msg:
+                self.stdOut('%s. [ERROR:335]' % (str(msg)))
         cursor.close()
         conn.close()
 

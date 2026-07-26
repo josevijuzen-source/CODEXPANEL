@@ -2387,7 +2387,17 @@ log_function_start "Post_Install_Tweak"
 log_info "Applying post-installation tweaks and configurations"
 if [[ -d /etc/pure-ftpd/conf ]]; then
   echo "yes" >/etc/pure-ftpd/conf/ChrootEveryone
-  systemctl restart pure-ftpd-mysql
+  if systemctl list-unit-files 2>/dev/null | grep -q "pure-ftpd-mysql"; then
+    systemctl restart pure-ftpd-mysql 2>&1 || {
+      log_warning "Pure-FTPd restart failed, continuing..."
+      echo "--- systemctl status pure-ftpd-mysql.service ---" >> "$LOG_FILE"
+      systemctl status pure-ftpd-mysql.service --no-pager >> "$LOG_FILE" 2>&1
+      echo "--- journalctl -u pure-ftpd-mysql.service ---" >> "$LOG_FILE"
+      journalctl -u pure-ftpd-mysql.service -n 100 --no-pager >> "$LOG_FILE" 2>&1
+    }
+  else
+    log_info "Pure-FTPd service not installed (pure-ftpd-mysql.service does not exist)"
+  fi
 fi
 
 if [[ -f /etc/pure-ftpd/pure-ftpd.conf ]]; then
