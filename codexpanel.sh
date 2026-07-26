@@ -1659,14 +1659,14 @@ if ! grep -q "pid_max" /etc/rc.local 2>/dev/null ; then
 cp /etc/resolv.conf /etc/resolv.conf-tmp
 
 # Find the line containing nameserver 8.8.8.8 pattern
-Line1="$(grep -n "f.write('nameserver 8.8.8.8')" installcodexpanel.py | head -n 1 | cut -d: -f1)"
+Line1="$(grep -n "f.write('nameserver 8.8.8.8')" installCodexPanel.py | head -n 1 | cut -d: -f1)"
 
 # Only modify the file if the pattern was found
 if [[ -n "$Line1" ]] && [[ "$Line1" =~ ^[0-9]+$ ]]; then
-    sed -i "${Line1}i\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ subprocess.call\(command, shell=True)" installcodexpanel.py
-    sed -i "${Line1}i\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ command = 'cat /etc/resolv.conf-tmp > /etc/resolv.conf'" installcodexpanel.py
+    sed -i "${Line1}i\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ subprocess.call\(command, shell=True)" installCodexPanel.py
+    sed -i "${Line1}i\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ command = 'cat /etc/resolv.conf-tmp > /etc/resolv.conf'" installCodexPanel.py
 else
-    echo "Warning: Could not find 'nameserver 8.8.8.8' pattern in installcodexpanel.py - skipping resolv.conf modification"
+    echo "Warning: Could not find 'nameserver 8.8.8.8' pattern in installCodexPanel.py - skipping resolv.conf modification"
 fi
 
 log_debug "System tweaks completed - SWAP, limits, and DNS configured"
@@ -1692,9 +1692,9 @@ cd "/root/codexpanel-tmp/lsws-$LSWS_Stable_Version/conf"  || exit
 if [[ "$License_Key" = "Trial" ]]; then
   Retry_Command "wget -q https://codexpanel.sh/license.litespeedtech.com/reseller/trial.key"
   # Update the serial number handling to use trial key
-  sed -i "s|writeSerial = open('lsws-[0-9.]\+/serial.no', 'w')|command = 'wget -q --output-document=./lsws-$LSWS_Stable_Version/trial.key https://codexpanel.sh/license.litespeedtech.com/reseller/trial.key'|g" "$Current_Dir/installcodexpanel.py"
-  sed -i 's|writeSerial.writelines(self.serial)|subprocess.call(command, shell=True)|g' "$Current_Dir/installcodexpanel.py"
-  sed -i 's|writeSerial.close()||g' "$Current_Dir/installcodexpanel.py"
+  sed -i "s|writeSerial = open('lsws-[0-9.]\+/serial.no', 'w')|command = 'wget -q --output-document=./lsws-$LSWS_Stable_Version/trial.key https://codexpanel.sh/license.litespeedtech.com/reseller/trial.key'|g" "$Current_Dir/installCodexPanel.py"
+  sed -i 's|writeSerial.writelines(self.serial)|subprocess.call(command, shell=True)|g' "$Current_Dir/installCodexPanel.py"
+  sed -i 's|writeSerial.close()||g' "$Current_Dir/installCodexPanel.py"
 else
   echo "$License_Key" > serial.no
 fi
@@ -1752,13 +1752,13 @@ if [[ "$Server_OS" = "CentOS" ]] ; then
   fi
 fi
 
-sed -i "s|https://www.litespeedtech.com/|https://codexpanel.sh/www.litespeedtech.com/|g" installcodexpanel.py
+sed -i "s|https://www.litespeedtech.com/|https://codexpanel.sh/www.litespeedtech.com/|g" installCodexPanel.py
 sed -i 's|composer.sh|composer_cn.sh|g' install.py
 sed -i 's|./composer_cn.sh|COMPOSER_ALLOW_SUPERUSER=1 ./composer_cn.sh|g' install.py
 sed -i 's|http://www.litespeedtech.com|https://codexpanel.sh/www.litespeedtech.com|g' install.py
 sed -i 's|https://snappymail.eu/repository/latest.tar.gz|https://codexpanel.sh/www.snappymail.eu/repository/latest.tar.gz|g' install.py
 
-sed -i "s|rep.codexpanel.net|codexpanel.sh/rep.codexpanel.net|g" installcodexpanel.py
+sed -i "s|rep.codexpanel.net|codexpanel.sh/rep.codexpanel.net|g" installCodexPanel.py
 sed -i "s|rep.codexpanel.net|codexpanel.sh/rep.codexpanel.net|g" install.py
 
 
@@ -1799,9 +1799,9 @@ if [[ $Server_Edition = "Enterprise" ]] ; then
 
   License_Validation
 
-  sed -i "s|lsws-5.4.2|lsws-$LSWS_Stable_Version|g" installcodexpanel.py
-  sed -i "s|lsws-5.3.5|lsws-$LSWS_Stable_Version|g" installcodexpanel.py
-  sed -i "s|lsws-6.0|lsws-$LSWS_Stable_Version|g" installcodexpanel.py
+  sed -i "s|lsws-5.4.2|lsws-$LSWS_Stable_Version|g" installCodexPanel.py
+  sed -i "s|lsws-5.3.5|lsws-$LSWS_Stable_Version|g" installCodexPanel.py
+  sed -i "s|lsws-6.0|lsws-$LSWS_Stable_Version|g" installCodexPanel.py
   #this sed must be done after license validation
 
   Enterprise_Flag="--ent ent --serial "

@@ -35,9 +35,9 @@ tar xzvf lsws-$LSWS_STABLE_VER-ent-x86_64-linux.tar.gz > /dev/null
 cd  /root/codexpanel-tmp/lsws-$LSWS_STABLE_VER/conf
 if [[ $LICENSE_KEY == "TRIAL" ]] ; then
 wget -q http://license.litespeedtech.com/reseller/trial.key
-sed -i "s|writeSerial = open('lsws-5.4.2/serial.no', 'w')|command = 'wget -q --output-document=./lsws-$LSWS_STABLE_VER/trial.key http://license.litespeedtech.com/reseller/trial.key'|g" $CURRENT_DIR/installcodexpanel.py
-sed -i 's|writeSerial.writelines(self.serial)|subprocess.call(command, shell=True)|g' $CURRENT_DIR/installcodexpanel.py
-sed -i 's|writeSerial.close()||g' $CURRENT_DIR/installcodexpanel.py
+sed -i "s|writeSerial = open('lsws-5.4.2/serial.no', 'w')|command = 'wget -q --output-document=./lsws-$LSWS_STABLE_VER/trial.key http://license.litespeedtech.com/reseller/trial.key'|g" $CURRENT_DIR/installCodexPanel.py
+sed -i 's|writeSerial.writelines(self.serial)|subprocess.call(command, shell=True)|g' $CURRENT_DIR/installCodexPanel.py
+sed -i 's|writeSerial.close()||g' $CURRENT_DIR/installCodexPanel.py
 else
 echo $LICENSE_KEY > serial.no
 fi
@@ -85,7 +85,7 @@ if [[ $SERVER_COUNTRY == "CN" ]] ; then
 #sed -i "${line2}i\ \ \ \ \ \ \ \ subprocess.call(command, shell=True)" install.py
 #sed -i "${line2}i\ \ \ \ \ \ \ \ command = 'wget codexpanel.sh/codexpanel-git.tar.gz'" install.py
 sed -i 's|wget https://rpms.litespeedtech.com/debian/|wget --no-check-certificate https://rpms.litespeedtech.com/debian/|g' install.py
-sed -i 's|https://repo.powerdns.com/repo-files/centos-auth-42.repo|https://'$DOWNLOAD_SERVER'/powerdns/powerdns.repo|g' installcodexpanel.py
+sed -i 's|https://repo.powerdns.com/repo-files/centos-auth-42.repo|https://'$DOWNLOAD_SERVER'/powerdns/powerdns.repo|g' installCodexPanel.py
 sed -i 's|https://snappymail.eu/repository/latest.tar.gz|https://'$DOWNLOAD_SERVER'/repository/latest.tar.gz|g' install.py
 
 sed -i 's|rpm -ivh https://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el7.noarch.rpm|curl -o /etc/yum.repos.d/litespeed.repo https://'$DOWNLOAD_SERVER'/litespeed/litespeed.repo|g' install.py
@@ -98,7 +98,7 @@ sed -i 's|dovecot-2.3-latest|dovecot-2.3-latest-mirror|g' install.py
 sed -i 's|git clone https://github.com/usmannasir/CodexPanel|wget https://codexpanel.sh/codexpanel-git.tar.gz \&\& tar xzvf codexpanel-git.tar.gz|g' install.py
 sed -i 's|https://repo.dovecot.org/ce-2.3-latest/centos/$releasever/RPMS/$basearch|https://'$DOWNLOAD_SERVER'/dovecot/|g' install.py
 sed -i 's|'$DOWNLOAD_SERVER'|codexpanel.sh|g' install.py
-sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.4.2-ent-x86_64-linux.tar.gz|https://'$DOWNLOAD_SERVER'/litespeed/lsws-'$LSWS_STABLE_VER'-ent-x86_64-linux.tar.gz|g' installcodexpanel.py
+sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.4.2-ent-x86_64-linux.tar.gz|https://'$DOWNLOAD_SERVER'/litespeed/lsws-'$LSWS_STABLE_VER'-ent-x86_64-linux.tar.gz|g' installCodexPanel.py
 # global change for CN , regardless provider and system
 
 	if [[ $SERVER_OS == "CentOS" ]] ; then
@@ -111,7 +111,7 @@ gpgkey = https://mirrors.tuna.tsinghua.edu.cn/mariadb/yum//RPM-GPG-KEY-MariaDB
 gpgcheck = 1" > MariaDB.repo
 #above to set mariadb db to Tsinghua repo
 		cd $DIR
-		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|https://codexpanel.sh/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|g' installcodexpanel.py
+		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|https://codexpanel.sh/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|g' installCodexPanel.py
 		mkdir /root/.pip
 		cat << EOF > /root/.pip/pip.conf
 [global]
@@ -831,8 +831,8 @@ if [[ $VERSION == "ENT" ]] ; then
 	SERIAL_NO="--ent ent --serial "
 fi
 
-sed -i 's|lsws-5.4.2|lsws-'$LSWS_STABLE_VER'|g' installcodexpanel.py
-sed -i 's|lsws-5.3.5|lsws-'$LSWS_STABLE_VER'|g' installcodexpanel.py
+sed -i 's|lsws-5.4.2|lsws-'$LSWS_STABLE_VER'|g' installCodexPanel.py
+sed -i 's|lsws-5.3.5|lsws-'$LSWS_STABLE_VER'|g' installCodexPanel.py
 #this sed must be done after license validation
 	
 echo -e "Preparing..."
@@ -1117,7 +1117,7 @@ options edns0" /etc/resolv.conf
 		fi
 	fi
 	if [[ $VERSION = "ENT" ]] ; then
-		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|https://codexpanel.sh/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|g' /usr/local/CodexCP/install/installcodexpanel.py
+		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|https://codexpanel.sh/packages/5.0/lsws-5.3.5-ent-x86_64-linux.tar.gz|g' /usr/local/CodexCP/install/installCodexPanel.py
 		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.8-ent-x86_64-linux.tar.gz|https://codexpanel.sh/packages/5.0/lsws-5.3.8-ent-x86_64-linux.tar.gz|g' /usr/local/CodexCP/serverStatus/serverStatusUtil.py
 		sed -i 's|https://www.litespeedtech.com/packages/5.0/lsws-5.3.8-ent-x86_64-linux.tar.gz|https://'$DOWNLOAD_SERVER'/litespeed/lsws-'$LSWS_STABLE_VER'-ent-x86_64-linux.tar.gz|g' /usr/local/CodexCP/serverStatus/serverStatusUtil.py
 		echo -e "If you have install LiteSpeed Enterprise, please run \e[31m/usr/local/lsws/admin/misc/lsup.sh\033[39m to update it to latest."

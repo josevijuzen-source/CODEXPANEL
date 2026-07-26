@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python
 """
 Common utility functions for CodexPanel installation scripts.
-This module contains shared functions used by both install.py and installcodexpanel.py
+This module contains shared functions used by both install.py and installCodexPanel.py
 """
 
 import os

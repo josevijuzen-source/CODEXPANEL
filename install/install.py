@@ -2891,13 +2891,13 @@ def main():
     checks.setup_account_codexpanel()
     checks.installcodexpanelRepo()
 
-    import installcodexpanel
+    import installCodexPanel
 
     if ent == 0:
-        installcodexpanel.Main(cwd, mysql, distro, ent, None, port, args.ftp, args.powerdns, args.publicip, remotemysql,
+        installCodexPanel.Main(cwd, mysql, distro, ent, None, port, args.ftp, args.powerdns, args.publicip, remotemysql,
                                mysqlhost, mysqldb, mysqluser, mysqlpassword, mysqlport)
     else:
-        installcodexpanel.Main(cwd, mysql, distro, ent, serial, port, args.ftp, args.powerdns, args.publicip,
+        installCodexPanel.Main(cwd, mysql, distro, ent, serial, port, args.ftp, args.powerdns, args.publicip,
                                remotemysql, mysqlhost, mysqldb, mysqluser, mysqlpassword, mysqlport)
 
     checks.setupPHPAndComposer()
@@ -2907,15 +2907,15 @@ def main():
 
     if args.postfix is None:
         checks.install_postfix_dovecot()
-        checks.setup_email_Passwords(installcodexpanel.InstallCodexPanel.mysqlPassword, mysql)
+        checks.setup_email_Passwords(installCodexPanel.InstallCodexPanel.mysqlPassword, mysql)
         checks.setup_postfix_dovecot_config(mysql)
-        installcodexpanel.InstallCodexPanel.setupWebmail()
+        installCodexPanel.InstallCodexPanel.setupWebmail()
     else:
         if args.postfix == 'ON':
             checks.install_postfix_dovecot()
-            checks.setup_email_Passwords(installcodexpanel.InstallCodexPanel.mysqlPassword, mysql)
+            checks.setup_email_Passwords(installCodexPanel.InstallCodexPanel.mysqlPassword, mysql)
             checks.setup_postfix_dovecot_config(mysql)
-            installcodexpanel.InstallCodexPanel.setupWebmail()
+            installCodexPanel.InstallCodexPanel.setupWebmail()
 
     checks.install_unzip()
     checks.install_zip()
@@ -2924,7 +2924,7 @@ def main():
     checks.installFirewalld()
     checks.install_default_keys()
 
-    checks.download_install_codexpanel(installcodexpanel.InstallCodexPanel.mysqlPassword, mysql)
+    checks.download_install_codexpanel(installCodexPanel.InstallCodexPanel.mysqlPassword, mysql)
     checks.downoad_and_install_raindloop()
     checks.download_install_phpmyadmin()
     checks.setupCLI()
