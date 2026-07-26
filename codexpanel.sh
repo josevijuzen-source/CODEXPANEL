@@ -1787,9 +1787,19 @@ log_function_start "Main_Installation"
 Debug_Log2 "Starting main installation..,30"
 log_info "Starting main CodexPanel installation"
 if [[ -d /usr/local/CodexCP ]] ; then
-  echo -e "\n CodexPanel already installed, exiting..."
-  Debug_Log2 "codexpanel already installed, exiting... [404]"
-  exit
+    # Determine if this is a complete or partial installation.
+    # A complete installation has the lscpd service running.
+    # A partial installation (interrupted/failed) does not.
+    if systemctl is-active --quiet lscpd 2>/dev/null; then
+        echo -e "\n CodexPanel already installed, exiting..."
+        Debug_Log2 "codexpanel already installed, exiting... [404]"
+        exit
+    fi
+    echo -e "\n Detected partial CodexPanel installation at /usr/local/CodexCP"
+    echo -e " Cleaning up for fresh install..."
+    Debug_Log2 "Partial installation detected, cleaning up /usr/local/CodexCP"
+    rm -rf /usr/local/CodexCP
+    rm -rf /usr/local/CodexCP2.tar.gz 2>/dev/null
 fi
 
 if [[ $Server_Edition = "Enterprise" ]] ; then

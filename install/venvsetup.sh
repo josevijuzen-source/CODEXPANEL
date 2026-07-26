@@ -817,8 +817,13 @@ fi
 main_install() {
 
 if [[ -e /usr/local/CodexCP ]] ; then
-	echo -e "\n CodexPanel already installed, exiting..."
-#exit
+	if systemctl is-active --quiet lscpd 2>/dev/null; then
+		echo -e "\n CodexPanel already installed, exiting..."
+		exit
+	fi
+	echo -e "\n Detected partial CodexPanel installation, cleaning up..."
+	rm -rf /usr/local/CodexCP
+	rm -rf /usr/local/CodexCP2.tar.gz 2>/dev/null
 fi
 	
 special_change
