@@ -1452,17 +1452,24 @@ Retry_Command "pip install --default-timeout=3600 -r /usr/local/requirments.txt"
 
 Debug_Log2 "Getting CodexPanel code..,4"
 
-cd /usr/local/codexpanel || exit
-rm -rf CODEXPANEL
+mkdir -p /usr/local/codexpanel
+Staging_Dir="/usr/local/codexpanel/CODEXPANEL"
 cd "$OLDPWD" || exit
 
-if git rev-parse --show-toplevel 2>/dev/null | grep -qi "CODEXPANEL"; then
+if [ -d "$Staging_Dir/.git" ]; then
+    echo -e "\nExisting CodexPanel staging repository found, updating...\n"
+    cd "$Staging_Dir" || exit
+    git fetch origin
+    git reset --hard "origin/$Branch_Name"
+    git clean -fd
+    cd "$OLDPWD" || exit
+elif git rev-parse --show-toplevel 2>/dev/null | grep -qi "CODEXPANEL"; then
     echo -e "\nRunning from inside CodexPanel repository, updating current tree...\n"
     git fetch origin
     git reset --hard "origin/$Branch_Name"
     git clean -fd
-    mkdir -p /usr/local/codexpanel/CODEXPANEL
-    cp -a . /usr/local/codexpanel/CODEXPANEL
+    mkdir -p "$Staging_Dir"
+    cp -a . "$Staging_Dir"
 elif [ -d "CODEXPANEL/.git" ]; then
     echo -e "\nExisting CODEXPANEL repository found, updating...\n"
     cd CODEXPANEL || exit
@@ -1479,7 +1486,7 @@ else
     cp -r CODEXPANEL /usr/local/codexpanel
 fi
 
-cd /usr/local/codexpanel/CODEXPANEL || exit
+cd "$Staging_Dir" || exit
 git checkout "$Branch_Name"
 Check_Return "git checkout"
 cd install || exit
