@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 #set -e -o pipefail
 #set -x
@@ -153,7 +153,7 @@ Server_Provider='Undefined'
 
 Watchdog="On"
 Redis_Hosting="No"
-Temp_Value=$(curl --silent --max-time 30 -4 https://codexpanel.net/version.txt)
+Temp_Value=$(curl --silent --max-time 30 https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/version.txt)
 Panel_Version=${Temp_Value:12:3}
 Panel_Build=${Temp_Value:25:1}
 
@@ -2181,7 +2181,7 @@ openssl req -x509 -config /root/codexpanel/cert_conf -extensions 'server_exts' -
 rm -f /root/codexpanel/cert_conf
 }
 
-# When lscpd sets PYTHONHOME=/usr, lswsgi loads Django from system Pythonâ€”not the CodexCP venv.
+# When lscpd sets PYTHONHOME=/usr, lswsgi loads Django from system Python???not the CodexCP venv.
 # Mirror requirements into system site-packages. See https://peps.python.org/pep-0668/
 Install_CodexCP_Runtime_Python_Requirements() {
   local req_hint="${1:-}"
