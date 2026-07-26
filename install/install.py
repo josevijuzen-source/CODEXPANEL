@@ -420,28 +420,37 @@ class preFlightsChecks:
 
             ##
 
-            if self.distro == ubuntu:
-                self.stdOut("Add CodexPanel user")
-                command = 'adduser --disabled-login --gecos "" codexpanel'
-                preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
+            if not install_utils.user_exists('codexpanel'):
+                if self.distro == ubuntu:
+                    self.stdOut("Add CodexPanel user")
+                    command = 'adduser --disabled-login --gecos "" codexpanel'
+                    preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
+                else:
+                    command = "useradd -s /bin/false codexpanel"
+                    preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
             else:
-                command = "useradd -s /bin/false codexpanel"
-                preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
+                logging.InstallLog.writeToFile('codexpanel user already exists, skipping.')
 
             ###############################
 
             ### Docker User/group
 
-            if self.distro == ubuntu:
-                command = 'adduser --disabled-login --gecos "" docker'
+            if not install_utils.user_exists('docker'):
+                if self.distro == ubuntu:
+                    command = 'adduser --disabled-login --gecos "" docker'
+                else:
+                    command = "adduser docker"
+
+                preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
             else:
-                command = "adduser docker"
+                logging.InstallLog.writeToFile('docker user already exists, skipping.')
 
-            preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
-
-            command = 'groupadd docker'
-            preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            if not install_utils.group_exists('docker'):
+                command = 'groupadd docker'
+                preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            else:
+                logging.InstallLog.writeToFile('docker group already exists, skipping.')
 
             command = 'usermod -aG docker docker'
             preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
@@ -1354,13 +1363,17 @@ $cfg['Servers'][$i]['LogoutURL'] = 'phpmyadminsignin.php?logout';
 
             ######################################## users and groups
 
-            command = 'groupadd -g 5000 vmail'
-            preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            if not install_utils.group_exists('vmail'):
+                command = 'groupadd -g 5000 vmail'
+                preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            else:
+                logging.InstallLog.writeToFile('vmail group already exists, skipping.')
 
-            ##
-
-            command = 'useradd -g vmail -u 5000 vmail -d /home/vmail -m'
-            preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            if not install_utils.user_exists('vmail'):
+                command = 'useradd -g vmail -u 5000 vmail -d /home/vmail -m'
+                preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            else:
+                logging.InstallLog.writeToFile('vmail user already exists, skipping.')
 
             ######################################## Further configurations
 
@@ -1812,16 +1825,22 @@ $cfg['Servers'][$i]['LogoutURL'] = 'phpmyadminsignin.php?logout';
             # Create lsphp symlink for fcgi-bin with better error handling
             self.setup_lsphp_symlink()
 
-            if self.is_centos_family():
-                command = 'adduser lscpd -M -d /usr/local/lscp'
-            else:
-                command = 'useradd lscpd -M -d /usr/local/lscp'
+            if not install_utils.user_exists('lscpd'):
+                if self.is_centos_family():
+                    command = 'adduser lscpd -M -d /usr/local/lscp'
+                else:
+                    command = 'useradd lscpd -M -d /usr/local/lscp'
 
-            preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
-
-            if self.is_centos_family():
-                command = 'groupadd lscpd'
                 preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+            else:
+                logging.InstallLog.writeToFile('lscpd user already exists, skipping.')
+
+            if self.is_centos_family():
+                if not install_utils.group_exists('lscpd'):
+                    command = 'groupadd lscpd'
+                    preFlightsChecks.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+                else:
+                    logging.InstallLog.writeToFile('lscpd group already exists, skipping.')
                 # Added group in useradd for Ubuntu
 
             command = 'usermod -a -G lscpd lscpd'

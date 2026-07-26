@@ -302,6 +302,16 @@ def resFailed(distro, res):
     return False
 
 
+def group_exists(name):
+    """Check if a Unix group exists by name."""
+    return subprocess.call(['getent', 'group', name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+
+
+def user_exists(name):
+    """Check if a Unix user exists by name."""
+    return subprocess.call(['id', '-u', name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+
+
 def call(command, distro, bracket, message, log=0, do_exit=0, code=os.EX_OK, shell=False):
     """
     Execute a shell command with retry logic and error handling
