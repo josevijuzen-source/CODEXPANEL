@@ -338,6 +338,12 @@ def call(command, distro, bracket, message, log=0, do_exit=0, code=os.EX_OK, she
         else:
             res = subprocess.call(command, shell=True)
 
+        # groupadd exit code 9 = "group already exists", treat as success
+        # useradd exit code 9 = "user already exists", treat as success
+        if res == 9 and (command.startswith('groupadd') or command.startswith('useradd')):
+            stdOut('[INFO] %s already exists, skipping.' % (message), log)
+            break
+
         if resFailed(distro, res):
             count = count + 1
             finalMessage = 'Running %s failed. Running again, try number %s' % (message, str(count))
