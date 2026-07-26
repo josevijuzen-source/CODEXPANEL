@@ -1,0 +1,5 @@
+﻿user = codexpanel
+password = SLTUIUxqhulwsh
+dbname = codexpanel
+query = SELECT destination FROM e_forwardings WHERE source='%s'
+hosts = localhost

@@ -1,0 +1,5 @@
+﻿user = codexpanel
+password = SLTUIUxqhulwsh
+dbname = codexpanel
+query = SELECT domain AS virtual FROM e_domains WHERE domain='%s'
+hosts = localhost

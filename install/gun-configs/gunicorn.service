@@ -1,0 +1,19 @@
+﻿[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+PIDFile=/run/gunicorn/pid
+User=codexpanel
+Group=codexpanel
+RuntimeDirectory=gunicorn
+WorkingDirectory=/usr/local/CodexCP
+ExecStart=/usr/local/CodexCP/bin/gunicorn --pid /run/gunicorn/gucpid --timeout 2000 --workers 2   \
+          --bind 127.0.0.1:5003 CodexCP.wsgi
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

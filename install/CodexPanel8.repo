@@ -1,0 +1,5 @@
+﻿[codexpanel]
+name=codexpanel
+baseurl=https://rep8.codexpanel.net/
+gpgkey=https://rep.codexpanel.net/RPM-GPG-KEY-codexpanel
+gpgcheck=1

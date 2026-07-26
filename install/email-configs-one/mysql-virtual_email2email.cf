@@ -1,0 +1,5 @@
+﻿user = codexpanel
+password = SLTUIUxqhulwsh
+dbname = codexpanel
+query = SELECT email FROM e_users WHERE email='%s'
+hosts = localhost

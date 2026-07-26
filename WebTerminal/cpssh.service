@@ -1,0 +1,12 @@
+﻿[Unit]
+Description = codexpanel SSH Websocket Daemon
+
+[Service]
+Type=forking
+ExecStart = /usr/local/CodexCP/bin/python /usr/local/CodexCP/WebTerminal/servCTRL.py start
+ExecStop = /usr/local/CodexCP/bin/python /usr/local/CodexCP/WebTerminal/servCTRL.py stop
+Restart = /usr/local/CodexCP/bin/python /usr/local/CodexCP/WebTerminal/servCTRL.py restart
+Restart=on-abnormal
+
+[Install]
+WantedBy=default.target

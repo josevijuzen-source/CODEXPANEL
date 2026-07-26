@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" ?>
+<installCommands>
+    <installSudo>
+        <centos7>yum install sudo -y</centos7>
+        <ubuntu16.04>apt-get install sudo -y</ubuntu16.04>
+    </installSudo>
+    <addUser>
+        <centos7>adduser CodexPanel</centos7>
+        <ubuntu16.04>adduser --disabled-password --gecos "" CodexPanel</ubuntu16.04>
+    </addUser>
+    <giveSudo>
+        <centos7>usermod -aG wheel CodexPanel</centos7>
+        <ubuntu16.04>usermod -aG sudo CodexPanel</ubuntu16.04>
+    </giveSudo>
+</installCommands>

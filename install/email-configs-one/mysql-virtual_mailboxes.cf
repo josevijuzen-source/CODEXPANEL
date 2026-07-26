@@ -1,0 +1,5 @@
+﻿user = codexpanel
+password = SLTUIUxqhulwsh
+dbname = codexpanel
+query = SELECT CONCAT(SUBSTRING_INDEX(email,'@',-1),'/',SUBSTRING_INDEX(email,'@',1),'/') FROM e_users WHERE email='%s'
+hosts = localhost

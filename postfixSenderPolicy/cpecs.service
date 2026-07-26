@@ -1,0 +1,12 @@
+﻿[Unit]
+Description = codexpanel Email Policy Control Daemon
+
+[Service]
+Type=forking
+ExecStart = /usr/local/CodexCP/postfixSenderPolicy/policyCTRL.py start
+ExecStop = /usr/local/CodexCP/postfixSenderPolicy/policyCTRL.py stop
+Restart = /usr/local/CodexCP/postfixSenderPolicy/policyCTRL.py restart
+Restart=on-abnormal
+
+[Install]
+WantedBy=default.target
