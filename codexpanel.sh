@@ -1450,22 +1450,39 @@ Debug_Log2 "Installing requirments..,3"
 Retry_Command "pip install --default-timeout=3600 -r /usr/local/requirments.txt"
   Check_Return "requirments" "no_exit"
 
-rm -rf codexpanel
-echo -e "\nFetching files from ${Git_Clone_URL}...\n"
-
 Debug_Log2 "Getting CodexPanel code..,4"
 
-Retry_Command "git clone ${Git_Clone_URL}"
-  Check_Return "git clone ${Git_Clone_URL}"
+cd /usr/local/codexpanel || exit
+rm -rf CODEXPANEL
+cd "$OLDPWD" || exit
 
-echo -e "\ncodexpanel source code downloaded...\n"
+if git rev-parse --show-toplevel 2>/dev/null | grep -qi "CODEXPANEL"; then
+    echo -e "\nRunning from inside CodexPanel repository, updating current tree...\n"
+    git fetch origin
+    git reset --hard "origin/$Branch_Name"
+    git clean -fd
+    mkdir -p /usr/local/codexpanel/CODEXPANEL
+    cp -a . /usr/local/codexpanel/CODEXPANEL
+elif [ -d "CODEXPANEL/.git" ]; then
+    echo -e "\nExisting CODEXPANEL repository found, updating...\n"
+    cd CODEXPANEL || exit
+    git fetch origin
+    git reset --hard "origin/$Branch_Name"
+    git clean -fd
+    cd "$OLDPWD" || exit
+    cp -r CODEXPANEL /usr/local/codexpanel
+else
+    echo -e "\nFetching files from ${Git_Clone_URL}...\n"
+    git clone ${Git_Clone_URL}
+    Check_Return "git clone ${Git_Clone_URL}"
+    echo -e "\ncodexpanel source code downloaded...\n"
+    cp -r CODEXPANEL /usr/local/codexpanel
+fi
 
-cd CodexPanel || exit
+cd /usr/local/codexpanel/CODEXPANEL || exit
 git checkout "$Branch_Name"
-  Check_Return "git checkout"
-cd - || exit
-cp -r CodexPanel /usr/local/codexpanel
-cd codexpanel/install || exit
+Check_Return "git checkout"
+cd install || exit
 
 Debug_Log2 "Necessary components installed..,5"
 }
