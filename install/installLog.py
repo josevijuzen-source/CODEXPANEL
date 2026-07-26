@@ -28,8 +28,10 @@ class InstallLog:
                     "%m.%d.%Y_%H-%M-%S") + "] " + message + "\n")
         file.close()
 
-        try:
-            finalData = json.dumps({'ipAddress': InstallLog.ServerIP, "InstallCodexPanelStatus": message})
-            requests.post(InstallLog.LogURL, data=finalData, timeout=10)
-        except:
-            pass
+        # Phone-home disabled for self-hosted fork
+        #try:
+        #    finalData = json.dumps({'ipAddress': InstallLog.ServerIP, "InstallCodexPanelStatus": message})
+        #    requests.post(InstallLog.LogURL, data=finalData, timeout=10)
+        #except:
+        #    pass
+        pass

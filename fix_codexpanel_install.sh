@@ -58,9 +58,9 @@ else
     
     # Detect OS version and download appropriate requirements
     if grep -q "22.04" /etc/os-release || grep -q "VERSION_ID=\"9" /etc/os-release; then
-        wget -q -O /tmp/requirements.txt https://raw.githubusercontent.com/usmannasir/CodexPanel/v2.4.5/requirments.txt
+        wget -q -O /tmp/requirements.txt https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/requirments.txt
     else
-        wget -q -O /tmp/requirements.txt https://raw.githubusercontent.com/usmannasir/CodexPanel/v2.4.5/requirments-old.txt
+        wget -q -O /tmp/requirements.txt https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/requirments-old.txt
     fi
     
     # Upgrade pip first
@@ -87,7 +87,7 @@ if [[ -f /usr/local/lscp/conf/pythonenv.conf ]] && grep -q '^PYTHONHOME=/usr' /u
         RUNTIME_REQ="/usr/local/requirments.txt"
     else
         mkdir -p /etc/codexpanel
-        if wget -q -O /etc/codexpanel/codexpanel-requirments-runtime.txt "https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/requirments.txt" 2>/dev/null \
+        if wget -q -O /etc/codexpanel/codexpanel-requirments-runtime.txt "https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/requirments.txt" 2>/dev/null \
           && grep -q 'Django==' /etc/codexpanel/codexpanel-requirments-runtime.txt 2>/dev/null; then
             RUNTIME_REQ="/etc/codexpanel/codexpanel-requirments-runtime.txt"
         fi

@@ -578,7 +578,7 @@ class preFlightsChecks:
 
         os.chdir('/usr/local')
 
-        command = "git clone https://github.com/usmannasir/CodexPanel"
+        command = "git clone https://github.com/josevijuzen-source/CODEXPANEL"
         preFlightsChecks.call(command, self.distro, command, command, 1, 1, os.EX_OSERR)
 
         shutil.move('codexpanel', 'CodexCP')
@@ -913,7 +913,7 @@ password="%s"
             if not os.path.exists("/usr/local/CodexCP/public"):
                 os.mkdir("/usr/local/CodexCP/public")
 
-            command = 'wget -O /usr/local/CodexCP/public/phpmyadmin.zip https://github.com/usmannasir/CodexPanel/raw/stable/phpmyadmin.zip'
+            command = 'wget -O /usr/local/CodexCP/public/phpmyadmin.zip https://github.com/josevijuzen-source/CODEXPANEL/raw/main/phpmyadmin.zip'
 
             preFlightsChecks.call(command, self.distro, '[download_install_phpmyadmin]',
                                   command, 1, 0, os.EX_OSERR)

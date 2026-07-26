@@ -361,7 +361,9 @@ echo -e "\n${1}=${2}\n" >> "/var/log/codexpanel_debug_$(date +"%Y-%m-%d")_${Rand
 Debug_Log2() {
 Check_Server_IP "$@" >/dev/null 2>&1
 echo -e "\n${1}" >> /var/log/installLogs.txt
-curl --max-time 20 -d '{"ipAddress": "'"$Server_IP"'", "InstallCodexPanelStatus": "'"$1"'"}' -H "Content-Type: application/json" -X POST https://cloud.codexpanel.net/servers/RecvData  >/dev/null 2>&1
+# Phone-home disabled for self-hosted fork
+# curl --max-time 20 -d '{"ipAddress": "'"$Server_IP"'", "InstallCodexPanelStatus": "'"$1"'"}' -H "Content-Type: application/json" -X POST https://cloud.codexpanel.net/servers/RecvData  >/dev/null 2>&1
+:
 }
 
 Branch_Check() {
@@ -1794,7 +1796,7 @@ if [[ $Server_Edition = "Enterprise" ]] ; then
   Enterprise_Flag="--ent ent --serial "
 fi
 
-sed -i 's|git clone https://github.com/usmannasir/CodexPanel|echo downloaded|g' install.py
+sed -i 's|git clone https://github.com/josevijuzen-source/CODEXPANEL|echo downloaded|g' install.py
 sed -i 's|mirror.codexpanel.net|codexpanel.sh|g' install.py
 
 
@@ -2222,7 +2224,7 @@ Install_CodexCP_Runtime_Python_Requirements() {
       wget -q -O "$td/r.txt" "${Git_Content_URL}/${Branch_Name}/requirments.txt" 2>/dev/null && grep -q "Django==" "$td/r.txt" 2>/dev/null && req_file="$td/r.txt"
       [[ -z "$req_file" ]] && wget -q -O "$td/r.txt" "${Git_Content_URL}/${Branch_Name}/requirments-old.txt" 2>/dev/null && grep -q "Django==" "$td/r.txt" 2>/dev/null && req_file="$td/r.txt"
     fi
-    [[ -z "$req_file" ]] && wget -q -O "$td/s.txt" "https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/requirments.txt" 2>/dev/null \
+    [[ -z "$req_file" ]] && wget -q -O "$td/s.txt" "https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/requirments.txt" 2>/dev/null \
       && grep -q "Django==" "$td/s.txt" 2>/dev/null && req_file="$td/s.txt"
   fi
   if [[ -z "$req_file" || ! -f "$req_file" ]]; then
@@ -2355,9 +2357,9 @@ chown -R codexpanel:codexpanel /usr/local/CodexCP/lib64 || true
 
 Pre_Install_Setup_Git_URL() {
 if [[ $Server_Country != "CN" ]] ; then
-  Git_User="usmannasir"
-  Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/codexpanel"
-  Git_Clone_URL="https://github.com/${Git_User}/codexpanel.git"
+  Git_User="josevijuzen-source"
+  Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/CODEXPANEL"
+  Git_Clone_URL="https://github.com/${Git_User}/CODEXPANEL.git"
 else
   Git_User="qtwrk"
   Git_Content_URL="https://gitee.com/${Git_User}/codexpanel/raw"

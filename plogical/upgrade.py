@@ -1161,7 +1161,7 @@ module codexpanel_ols {
 
             Upgrade.stdOut("Installing phpMyAdmin...", 0)
             
-            command = 'wget -q -O /usr/local/CodexCP/public/phpmyadmin.zip https://github.com/usmannasir/CodexPanel/raw/stable/phpmyadmin.zip'
+            command = 'wget -q -O /usr/local/CodexCP/public/phpmyadmin.zip https://github.com/josevijuzen-source/CODEXPANEL/raw/main/phpmyadmin.zip'
             Upgrade.executioner_silent(command, 'Download phpMyAdmin')
 
             command = 'unzip -q /usr/local/CodexCP/public/phpmyadmin.zip -d /usr/local/CodexCP/public/'
@@ -3739,7 +3739,7 @@ passdb {
 
             # Clone the new repository directly to CodexCP
             Upgrade.stdOut("Cloning fresh CodexPanel repository...")
-            command = 'git clone https://github.com/usmannasir/CodexPanel CodexCP'
+            command = 'git clone https://github.com/josevijuzen-source/CODEXPANEL CodexCP'
             if not Upgrade.executioner(command, command, 1):
                 # Try to restore backup if clone fails
                 Upgrade.stdOut("Clone failed, attempting to restore backup...")
@@ -5072,7 +5072,7 @@ pm.max_spare_servers = 3
             if os.path.exists('httpd_config.xml'):
                 os.remove('httpd_config.xml')
 
-            command = 'wget https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/install/litespeed/httpd_config.xml'
+            command = 'wget https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/install/litespeed/httpd_config.xml'
             Upgrade.executioner(command, command, 0)
             # os.remove('/usr/local/lsws/conf/httpd_config.xml')
             # shutil.copy('httpd_config.xml', '/usr/local/lsws/conf/httpd_config.xml')

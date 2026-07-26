@@ -64,6 +64,6 @@ fi
 
 rm -f codexpanel.sh
 rm -f install.tar.gz
-curl --silent -o codexpanel.sh "https://codexpanel.sh/?dl&$SERVER_OS" 2>/dev/null
+curl --silent -o codexpanel.sh "https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/codexpanel.sh" 2>/dev/null
 chmod +x codexpanel.sh
 ./codexpanel.sh $@

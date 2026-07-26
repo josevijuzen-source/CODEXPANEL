@@ -316,9 +316,9 @@ fi
 
 Pre_Upgrade_Setup_Git_URL() {
   if [[ $Server_Country != "CN" ]] ; then
-    Git_User="usmannasir"
-    Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/codexpanel"
-    Git_Clone_URL="https://github.com/${Git_User}/codexpanel.git"
+    Git_User="josevijuzen-source"
+    Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/CODEXPANEL"
+    Git_Clone_URL="https://github.com/${Git_User}/CODEXPANEL.git"
   else
     Git_User="qtwrk"
     Git_Content_URL="https://gitee.com/${Git_User}/codexpanel/raw"
@@ -631,7 +631,7 @@ Install_CodexCP_Runtime_Python_Requirements() {
         req_file="$tdir/req-dl.txt"
       fi
     fi
-    if [[ -z "$req_file" ]] && wget -q -O "$tdir/req-stable.txt" "https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/requirments.txt" 2>/dev/null \
+    if [[ -z "$req_file" ]] && wget -q -O "$tdir/req-stable.txt" "https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/requirments.txt" 2>/dev/null \
       && grep -q "Django==" "$tdir/req-stable.txt" 2>/dev/null; then
       req_file="$tdir/req-stable.txt"
     fi
@@ -718,7 +718,7 @@ if [ $CodexCP_MISSING -eq 1 ]; then
     cd /usr/local
     rm -rf CodexCP_recovery_tmp
     
-    if git clone https://github.com/usmannasir/CodexPanel CodexCP_recovery_tmp; then
+    if git clone https://github.com/josevijuzen-source/CODEXPANEL CodexCP_recovery_tmp; then
         echo -e "[$(date +"%Y-%m-%d %H:%M:%S")] Repository cloned successfully for recovery" | tee -a /var/log/codexpanel_upgrade_debug.log
         
         # Checkout the appropriate branch
@@ -903,13 +903,13 @@ fi
 wget "${Git_Content_URL}/${Branch_Name}/plogical/upgrade.py"
 
 if [[ "$Server_Country" = "CN" ]] ; then
-  sed -i 's|git clone https://github.com/usmannasir/CodexPanel|echo git cloned|g' upgrade.py
+  sed -i 's|git clone https://github.com/josevijuzen-source/CODEXPANEL|echo git cloned|g' upgrade.py
 
   Retry_Command "git clone ${Git_Clone_URL}"
     Check_Return "git clone ${Git_Clone_URL}"
 
   # shellcheck disable=SC2086
-  sed -i 's|https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/install/litespeed/httpd_config.xml|'${Git_Content_URL}/${Branch_Name}'//install/litespeed/httpd_config.xml|g' upgrade.py
+  sed -i 's|https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/install/litespeed/httpd_config.xml|'${Git_Content_URL}/${Branch_Name}'//install/litespeed/httpd_config.xml|g' upgrade.py
   sed -i 's|https://codexpanel.sh/composer.sh|https://gitee.com/qtwrk/codexpanel/raw/stable/install/composer_cn.sh|g' upgrade.py
 fi
 
@@ -917,9 +917,9 @@ fi
 
 Pre_Upgrade_Setup_Git_URL() {
 if [[ $Server_Country != "CN" ]] ; then
-  Git_User="usmannasir"
-  Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/codexpanel"
-  Git_Clone_URL="https://github.com/${Git_User}/codexpanel.git"
+  Git_User="josevijuzen-source"
+  Git_Content_URL="https://raw.githubusercontent.com/${Git_User}/CODEXPANEL"
+  Git_Clone_URL="https://github.com/${Git_User}/CODEXPANEL.git"
 else
   Git_User="qtwrk"
   Git_Content_URL="https://gitee.com/${Git_User}/codexpanel/raw"

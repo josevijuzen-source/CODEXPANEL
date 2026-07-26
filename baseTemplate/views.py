@@ -52,7 +52,7 @@ def versionManagement(request):
     currentVersion = VERSION
     currentBuild = str(BUILD)
 
-    u = "https://api.github.com/repos/usmannasir/CodexPanel/commits?sha=v%s.%s" % (latestVersion, latestBuild)
+    u = "https://api.github.com/repos/josevijuzen-source/CODEXPANEL/commits?sha=v%s.%s" % (latestVersion, latestBuild)
     logging.writeToFile(u)
     r = requests.get(u)
     latestcomit = r.json()[0]['sha']
@@ -79,7 +79,7 @@ def versionManagement(request):
 def upgrade_CodexPanel(request):
     if request.method == 'POST':
         try:
-            upgrade_command = 'sh <(curl https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/preUpgrade.sh || wget -O - https://raw.githubusercontent.com/usmannasir/CodexPanel/stable/preUpgrade.sh)'
+            upgrade_command = 'sh <(curl https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/preUpgrade.sh || wget -O - https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/preUpgrade.sh)'
             result = subprocess.run(upgrade_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     universal_newlines=True)
 
@@ -271,7 +271,7 @@ def versionManagment(request):
     currentVersion = VERSION
     currentBuild = str(BUILD)
 
-    u = "https://api.github.com/repos/usmannasir/CodexPanel/commits?sha=v%s.%s" % (latestVersion, latestBuild)
+    u = "https://api.github.com/repos/josevijuzen-source/CODEXPANEL/commits?sha=v%s.%s" % (latestVersion, latestBuild)
     logging.CodexCPLogFileWriter.writeToFile(u)
     r = requests.get(u)
     latestcomit = r.json()[0]['sha']
@@ -413,13 +413,13 @@ def design(request):
 
     ####### Fetch sha...
 
-    sha_url = "https://api.github.com/repos/usmannasir/CodexPanel-Themes/commits"
+    sha_url = "https://api.github.com/repos/josevijuzen-source/CODEXPANEL-Themes/commits"
 
     sha_res = requests.get(sha_url)
 
     sha = sha_res.json()[0]['sha']
 
-    l = "https://api.github.com/repos/usmannasir/CodexPanel-Themes/git/trees/%s" % sha
+    l = "https://api.github.com/repos/josevijuzen-source/CODEXPANEL-Themes/git/trees/%s" % sha
     fres = requests.get(l)
     tott = len(fres.json()['tree'])
     finalData['tree'] = []
@@ -447,7 +447,7 @@ def getthemedata(request):
 
         # logging.CodexCPLogFileWriter.writeToFile(str(data) + "  [themedata]")
 
-        url = "https://raw.githubusercontent.com/usmannasir/CodexPanel-Themes/main/%s/design.css" % data['Themename']
+        url = "https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL-Themes/main/%s/design.css" % data['Themename']
 
         res = requests.get(url)
 
