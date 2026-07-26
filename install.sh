@@ -1,4 +1,4 @@
-﻿#!/bin/sh
+#!/bin/sh
 OUTPUT=$(cat /etc/*release)
 if  echo $OUTPUT | grep -q "CentOS Linux 7" ; then
         echo "Checking and installing curl and wget"
