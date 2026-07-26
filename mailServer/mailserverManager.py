@@ -1322,12 +1322,12 @@ class MailServerManager(multi.Thread):
 
             ######################################## users and groups
 
-            command = 'groupadd -g 5000 vmail'
+            command = 'getent group vmail >/dev/null 2>&1 || groupadd -g 5000 vmail'
             ProcessUtilities.executioner(command)
 
             ##
 
-            command = 'useradd -g vmail -u 5000 vmail -d /home/vmail -m'
+            command = 'id -u vmail >/dev/null 2>&1 || useradd -g vmail -u 5000 vmail -d /home/vmail -m'
             ProcessUtilities.executioner(command)
 
             ######################################## Further configurations

@@ -679,8 +679,9 @@ module codexpanel_ols {
         else:
             try:
                 try:
-                    command = 'groupadd nobody'
-                    install_utils.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
+                    if not install_utils.group_exists('nobody'):
+                        command = 'groupadd nobody'
+                        install_utils.call(command, self.distro, command, command, 1, 0, os.EX_OSERR)
                 except:
                     pass
 
@@ -1110,24 +1111,59 @@ gpgcheck=1
 
     def changeMYSQLRootPassword(self):
         if self.remotemysql == 'OFF':
-            if self.distro == ubuntu:
+            # Detect MariaDB version to choose compatible SQL syntax
+            # MariaDB >= 10.4 removed the `plugin` column from mysql.user
+            skip_plugin_update = False
+            try:
+                ver_proc = subprocess.run(
+                    ['mariadb', '-u', 'root', '-e', 'SELECT VERSION();'],
+                    capture_output=True, text=True, timeout=10
+                )
+                if ver_proc.returncode != 0:
+                    ver_proc = subprocess.run(
+                        ['mysql', '-u', 'root', '-e', 'SELECT VERSION();'],
+                        capture_output=True, text=True, timeout=10
+                    )
+                version_output = ver_proc.stdout.strip()
+                match = re.search(r'(\d+)\.(\d+)', version_output)
+                if match:
+                    major = int(match.group(1))
+                    minor = int(match.group(2))
+                    if major > 10 or (major == 10 and minor >= 4):
+                        skip_plugin_update = True
+                self.stdOut("MariaDB version detected: " + version_output)
+            except Exception as exc:
+                self.stdOut("Could not detect MariaDB version: " + str(exc))
+
+            if self.distro == ubuntu and not skip_plugin_update:
                 passwordCMD = "use mysql;DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%%';GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '%s';UPDATE user SET plugin='' WHERE User='root';flush privileges;" % (
                     InstallCodexPanel.mysql_Root_password)
             else:
                 passwordCMD = "use mysql;DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%%';GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '%s';flush privileges;" % (
                     InstallCodexPanel.mysql_Root_password)
 
+            def run_mysql_sql(raw_cmd):
+                try:
+                    proc = subprocess.run(raw_cmd, shell=True, capture_output=True, text=True, timeout=30)
+                    if proc.returncode != 0:
+                        err = proc.stderr.strip() if proc.stderr else "return code %d" % proc.returncode
+                        logging.InstallLog.writeToFile("[ERROR] MySQL command failed: %s" % err)
+                        self.stdOut("[ERROR] MySQL command failed: %s" % err)
+                    return proc.returncode
+                except Exception as exc:
+                    logging.InstallLog.writeToFile("[ERROR] MySQL command exception: %s" % str(exc))
+                    return -1
+
             # For AlmaLinux 9, try mysql command first, then mariadb
             if self.distro == cent8 or self.distro == openeuler:
                 command = 'mysql -u root -e "' + passwordCMD + '"'
-                result = install_utils.call(command, self.distro, command, command, 0, 0, os.EX_OSERR)
+                result = run_mysql_sql(command)
                 if result != 0:
-                    # If mysql command fails, try mariadb
                     command = 'mariadb -u root -e "' + passwordCMD + '"'
-                    install_utils.call(command, self.distro, command, command, 0, 0, os.EX_OSERR)
+                    run_mysql_sql(command)
             else:
                 command = 'mariadb -u root -e "' + passwordCMD + '"'
-                install_utils.call(command, self.distro, command, command, 0, 0, os.EX_OSERR)
+                run_mysql_sql(command)
 
     def startMariaDB(self):
 

@@ -889,10 +889,10 @@ create_lsadm_freebsd()
 
 create_lsadm()
 {
-    groupadd lsadm
+    getent group lsadm >/dev/null 2>&1 || groupadd lsadm
     #1>/dev/null 2>&1
     lsadm_gid=`grep "^lsadm:" /etc/group | awk -F : '{ print $3; }'`
-    useradd -g $lsadm_gid -d / -r -s /sbin/nologin lsadm
+    id -u lsadm >/dev/null 2>&1 || useradd -g $lsadm_gid -d / -r -s /sbin/nologin lsadm
     usermod -a -G $WS_GROUP lsadm
     #1>/dev/null 2>&1
 
@@ -900,10 +900,10 @@ create_lsadm()
 
 create_lsadm_solaris()
 {
-    groupadd lsadm
+    getent group lsadm >/dev/null 2>&1 || groupadd lsadm
     #1>/dev/null 2>&1
     lsadm_gid=`grep "^lsadm:" /etc/group | awk -F: '{ print $3; }'`
-    useradd -g $lsadm_gid -d / -s /bin/false lsadm
+    id -u lsadm >/dev/null 2>&1 || useradd -g $lsadm_gid -d / -s /bin/false lsadm
     usermod -G $WS_GROUP lsadm
 
     #1>/dev/null 2>&1

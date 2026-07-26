@@ -53,7 +53,7 @@ class vhost:
 
             ProcessUtilities.executioner(command)
 
-            command = f"/usr/sbin/groupadd {virtualHostUser}"
+            command = f"getent group {virtualHostUser} >/dev/null 2>&1 || /usr/sbin/groupadd {virtualHostUser}"
             ProcessUtilities.executioner(command)
 
             command = f"/usr/sbin/usermod -a -G {virtualHostUser} {virtualHostUser}"

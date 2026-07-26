@@ -1419,10 +1419,10 @@ LogFile /var/log/clamav/clamav.log
                 conf.close()
 
 
-            command = "groupadd spamd"
+            command = "getent group spamd >/dev/null 2>&1 || groupadd spamd"
             ProcessUtilities.normalExecutioner(command)
 
-            command = "useradd -g spamd -s /bin/false -d /var/log/spamassassin spamd"
+            command = "id -u spamd >/dev/null 2>&1 || useradd -g spamd -s /bin/false -d /var/log/spamassassin spamd"
             ProcessUtilities.normalExecutioner(command)
 
             ##
@@ -2288,12 +2288,12 @@ class MailServerManagerUtils(multi.Thread):
 
             ######################################## users and groups
 
-            command = 'groupadd -g 5000 vmail'
+            command = 'getent group vmail >/dev/null 2>&1 || groupadd -g 5000 vmail'
             ProcessUtilities.executioner(command)
 
             ##
 
-            command = 'useradd -g vmail -u 5000 vmail -d /home/vmail -m'
+            command = 'id -u vmail >/dev/null 2>&1 || useradd -g vmail -u 5000 vmail -d /home/vmail -m'
             ProcessUtilities.executioner(command)
 
             ######################################## Further configurations

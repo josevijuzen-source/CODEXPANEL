@@ -87,7 +87,7 @@ class ServerStatusUtil(multi.Thread):
             cwd = os.getcwd()
             try:
 
-                command = 'groupadd nobody'
+                command = 'getent group nobody >/dev/null 2>&1 || groupadd nobody'
                 ServerStatusUtil.executioner(command, statusFile)
 
             except:
