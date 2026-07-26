@@ -153,7 +153,7 @@ Server_Provider='Undefined'
 
 Watchdog="On"
 Redis_Hosting="No"
-Temp_Value=$(curl --silent --max-time 30 -4 https://codexpanel.net/version.txt)
+Temp_Value=$(curl --silent --max-time 30 https://raw.githubusercontent.com/josevijuzen-source/CODEXPANEL/main/version.txt)
 Panel_Version=${Temp_Value:12:3}
 Panel_Build=${Temp_Value:25:1}
 
