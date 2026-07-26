@@ -359,10 +359,7 @@ echo -e "\n${1}=${2}\n" >> "/var/log/codexpanel_debug_$(date +"%Y-%m-%d")_${Rand
 }
 
 Debug_Log2() {
-Check_Server_IP "$@" >/dev/null 2>&1
 echo -e "\n${1}" >> /var/log/installLogs.txt
-# Phone-home disabled for self-hosted fork
-# curl --max-time 20 -d '{"ipAddress": "'"$Server_IP"'", "InstallCodexPanelStatus": "'"$1"'"}' -H "Content-Type: application/json" -X POST https://cloud.codexpanel.net/servers/RecvData  >/dev/null 2>&1
 :
 }
 
@@ -481,11 +478,8 @@ Server_IP=$(curl --silent --max-time 30 -4 https://codexpanel.sh/?ip)
     echo -e "Valid IP detected..."
     log_info "Valid server IP detected: $Server_IP"
   else
-    echo -e "Can not detect IP, exit..."
-    Debug_Log2 "Can not detect IP. [404]"
-    log_error "Failed to detect valid server IP address"
-    log_function_end "Check_Server_IP" 1
-    exit
+    echo -e "Cannot detect server IP (infrastructure not available), continuing..."
+    Server_IP="0.0.0.0"
   fi
 
 echo -e "\nChecking server location...\n"
